@@ -4,7 +4,7 @@ UCL Statistical Natural Language Processing coursework, 2025/26, group project. 
 
 ## What we did
 
-We replicated the finance pipeline of ChronoBERT (He et al., 2025) on FNSPID news headlines and tested whether its look-ahead-bias conclusions survive a change of dataset and of regression framework (expanding window, rolling window, Fama-MacBeth). We also tested whether ChronoBERT checkpoints show the knowledge cutoffs they claim. The notebooks replicate the pipeline and run the robustness and knowledge-cutoff tests described below; see Known limitations before reading any number as a result.
+We replicated the ChronoBERT finance pipeline (He et al., 2025) on FNSPID news headlines, then tested whether its look-ahead-bias conclusions hold on a different dataset and under different regression frameworks (expanding window, rolling window, Fama-MacBeth). We also tested whether the ChronoBERT checkpoints show the knowledge cutoffs they claim. The notebooks replicate the pipeline and run the robustness and knowledge-cutoff tests described below; see Known limitations before reading any number as a result.
 
 ## Contents
 
@@ -28,15 +28,14 @@ Python 3.9 with `torch transformers datasets huggingface_hub scikit-learn scipy 
 
 ## Known limitations
 
-- News timing differs across notebooks. `paper_replication` assigns headlines after 16:00 ET to the next day; `ChronoBERT_experiments`, `ChronoBERT_fama_macbeth_sp500_10-22` and `ChronoBERT_rolling_covid` use the UTC calendar date, so some after-close news is traded at the same day's close. Absolute Sharpe ratios in those three notebooks are optimistic.
-- The notebooks differ in more than the regression framework: pooling (CLS or mean), unit (headline or stock-day), stock universe, sample period and FinBERT checkpoint all change between them. Differences between notebooks should not be read as the effect of the framework alone.
-- The COVID universe (`ChronoBERT_experiments`, `ChronoBERT_rolling_covid`) was chosen with hindsight, and the S&P 100 list in `ChronoBERT_fama_macbeth_sp500_10-22` is the current one applied back to 2010.
-- Portfolios are equal-weighted and rebalanced daily with no transaction costs; turnover is not reported. Daily long and short legs can contain only a few stocks.
-- Bootstrap intervals resample days independently and per model, and the permutation test assumes the two strategies' daily returns are exchangeable. Neither is a test of equal Sharpe ratios. The Ledoit-Wolf test is the appropriate one; its implementation uses an approximate gradient, and no test is corrected for multiple comparisons.
-- The Fama-MacBeth sample starts in 2010, when none of the ChronoBERT checkpoints compared is free of look-ahead; the cleanest comparison is the 2019 to 2022 sub-period.
-- `paper_replication` defaults to debug mode (40,000 stock-days per year, quintile portfolios); the subsampling result is based on five repeats.
-- The knowledge-cutoff test uses one prompt template and 26 years, and in two pairs the "wrong" year is also a correct answer. The question banks for `chronological_tests` are not included, and how they were built is not documented here.
-- Results are from a one-term coursework project and are indicative only.
+- News timing differs between notebooks. `paper_replication` moves headlines published after 16:00 ET to the next day. `ChronoBERT_experiments`, `ChronoBERT_fama_macbeth_sp500_10-22` and `ChronoBERT_rolling_covid` use the UTC calendar date, so some news that arrives after the close is traded at that day's close, and the absolute Sharpe ratios in those three notebooks are too high.
+- The notebooks also differ in pooling (CLS or mean), unit (headline or stock-day), stock universe, sample period and FinBERT checkpoint. A difference between two notebooks is not the effect of the regression framework alone.
+- The COVID universe in `ChronoBERT_experiments` and `ChronoBERT_rolling_covid` was picked with hindsight. `ChronoBERT_fama_macbeth_sp500_10-22` applies the current S&P 100 list back to 2010.
+- Portfolios are equal-weighted and rebalanced daily with no transaction costs, and turnover is not reported. On some days the long and short legs hold only a few stocks.
+- The bootstrap intervals resample days independently for each model, and the permutation test assumes the two strategies' daily returns are exchangeable, so neither tests whether two Sharpe ratios are equal. The Ledoit-Wolf test does, but our implementation uses an approximate gradient. No test is corrected for multiple comparisons.
+- The Fama-MacBeth sample starts in 2010, when none of the ChronoBERT checkpoints compared is free of look-ahead. The 2019 to 2022 sub-period is the cleanest comparison.
+- `paper_replication` runs in debug mode by default (40,000 stock-days per year, quintile portfolios), and the subsampling result rests on five repeats.
+- The knowledge-cutoff test uses one prompt template over 26 years, and in two of the pairs the "wrong" year is also correct. The question banks for `chronological_tests` are not included, and this repository does not say how they were built.
 
 ## Authors
 
